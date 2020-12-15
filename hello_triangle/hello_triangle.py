@@ -1,54 +1,111 @@
-if __name__ == '__main__':
-    import sys
-    import glfw
-    import OpenGL.GL as gl
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
-    def on_key(window, key, scancode, action, mods):
-        if key == glfw.KEY_ESCAPE and action == glfw.PRESS:
-            glfw.set_window_should_close(window,1)
+import sys, os
+import OpenGL.GL as gl
+import glfw
+import numpy as np
 
-    # Initialize the library
-    if not glfw.init():
-        sys.exit()
+WIN_WIDTH = 800
+WIN_HEIGHT = 600
 
-    # Create a windowed mode window and its OpenGL context
+vertexShaderSource = """
+#version 330 core
+layout (location = 0) in vec3 aPos;
+void main()
+{
+    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+}
+"""
+
+fragmentShaderSource = """
+#version 330 core
+out vec4 FragColor;
+void main()
+{
+    FragColor = vec4(1.0, 0.5, 0.2, 1.0);
+}
+"""
+
+vertices = np.array([0.5, 0.5, 0,
+                     0.5,-0.5, 0,
+                    -0.5,-0.5, 0,
+                    -0.5, 0.5, 0], dtype = np.float32)
+
+indices = np.array([0.0, 1, 3,
+                    1, 2, 3], dtype = np.uint32)
+
+def framebuffer_size_callback(window, width, height):
+    gl.glViewport(0, 0, width, height)
+
+def processInput(window):
+    if glfw.get_key(window, glfw.KEY_ESCAPE) == glfw.PRESS:
+        glfw.glfwSetWindowShouldClose()
+
+    if glfw.get_key(window, glfw.KEY_LEFT) == glfw.PRESS:
+        gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_FILL)
+
+    if glfw.get_key(window, glfw.KEY_RIGHT) == glfw.PRESS:
+        gl.glPolygonMode(gl.GL_FRONT_AND_BACK, gl.GL_LINE)
+
+def main():
+    glfw.init()
+    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+    glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
+
     window = glfw.create_window(640, 480, "Hello World", None, None)
-    if not window:
-        glfw.terminate()
-        sys.exit()
+    if window == 0:
+        print("failed to create window")
+        glfw.glfwTerminate()
 
-    # Make the window's context current
     glfw.make_context_current(window)
+    glfw.set_framebuffer_size_callback(window, framebuffer_size_callback)
 
-    # Install a key handler
-    glfw.set_key_callback(window, on_key)
+    vertexShader = gl.glCreateShader(gl.GL_VERTEX_SHADER)
+    gl.glShaderSource(vertexShader, vertexShaderSource)
+    gl.glCompileShader(vertexShader)
 
-    # Loop until the user closes the window
+    fragmentShader = gl.glCreateShader(gl.GL_FRAGMENT_SHADER)
+    gl.glShaderSource(fragmentShader, fragmentShaderSource)
+    gl.glCompileShader(fragmentShader)
+
+    shaderProgram = gl.glCreateProgram()
+    gl.glAttachShader(shaderProgram, vertexShader)
+    gl.glAttachShader(shaderProgram, fragmentShader)
+    gl.glLinkProgram(shaderProgram)
+
+    gl.glDeleteShader(vertexShader)
+    gl.glDeleteShader(fragmentShader)
+
+    VAO = gl.glGenVertexArrays(1)
+    VBO, EBO = gl.glGenBuffers(2)
+
+    gl.glBindVertexArray(VAO)
+    gl.glBindBuffer(gl.GL_ARRAY_BUFFER, VBO)
+    gl.glBufferData(gl.GL_ARRAY_BUFFER, sys.getsizeof(vertices), vertices, gl.GL_STATIC_DRAW)
+    gl.glBindBuffer(gl.GL_ELEMENT_ARRAY_BUFFER, EBO)
+    gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, sys.getsizeof(indices), indices, gl.GL_STATIC_DRAW)
+
+    gl.glVertexAttribPointer(gl.glGetAttribLocation(shaderProgram, 'aPos'), 3, gl.GL_FLOAT, gl.GL_FALSE, 12, None)
+    gl.glEnableVertexAttribArray(0)
+    gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)
+    gl.glBindVertexArray(0)
+
     while not glfw.window_should_close(window):
-        # Render here
-        width, height = glfw.get_framebuffer_size(window)
-        ratio = width / float(height)
-        gl.glViewport(0, 0, width, height)
+        processInput(window)
+        gl.glClearColor(0.2, 0.3, 0.3, 1.0)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-        gl.glMatrixMode(gl.GL_PROJECTION)
-        gl.glLoadIdentity()
-        gl.glOrtho(-ratio, ratio, -1, 1, 1, -1)
-        gl.glMatrixMode(gl.GL_MODELVIEW)
-        gl.glLoadIdentity()
-        # gl.glRotatef(glfw.get_time() * 50, 0, 0, 1)
-        gl.glBegin(gl.GL_TRIANGLES)
-        gl.glColor3f(1, 0, 0)
-        gl.glVertex3f(-0.6, -0.4, 0)
-        gl.glColor3f(0, 1, 0)
-        gl.glVertex3f(0.6, -0.4, 0)
-        gl.glColor3f(0, 0, 1)
-        gl.glVertex3f(0, 0.6, 0)
-        gl.glEnd()
 
-        # Swap front and back buffers
+        gl.glUseProgram(shaderProgram)
+        gl.glBindVertexArray(VAO)
+        gl.glDrawElements(gl.GL_TRIANGLES, len(indices), gl.GL_UNSIGNED_INT, None)
+        # gl.glDrawArrays(gl.GL_TRIANGLES, 0, 3)
+
         glfw.swap_buffers(window)
-
-        # Poll for and process events
         glfw.poll_events()
 
     glfw.terminate()
+
+if __name__ == "__main__":
+    main()

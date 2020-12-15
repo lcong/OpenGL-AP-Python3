@@ -13,5 +13,5 @@
 
 
 
-![](D:\GitRepo\OpenGL-AP-Python3\resouce\picture\renderdoc4python3.png)
+![](D:\GitRepo\OpenGL-AP-Python3\resource\picture\renderdoc4python3.png)
 
