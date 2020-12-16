@@ -12,7 +12,7 @@
 #### 1.2 numpy 库的版本选择
 
 -  pip3 install --upgrade numpy==1.19.3 或者
--  pip3 install --numpy==1.19.3
+-  pip3 install numpy==1.19.3
 
 
 #### 1.3renderdoc抓取frm
