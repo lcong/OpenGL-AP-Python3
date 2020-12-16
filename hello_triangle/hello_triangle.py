@@ -11,10 +11,11 @@ WIN_HEIGHT = 600
 
 vertexShaderSource = """
 #version 330 core
-layout (location = 0) in vec3 aPos;
+layout (location = 0) in vec4 aPos;
+vec4 aTempPos=aPos;
 void main()
 {
-    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);
+    gl_Position = vec4(aTempPos.x, aTempPos.y, aTempPos.z, aTempPos.w);
 }
 """
 
@@ -27,13 +28,12 @@ void main()
 }
 """
 
-vertices = np.array([0.5, 0.5, 0,
-                     0.5,-0.5, 0,
-                    -0.5,-0.5, 0,
-                    -0.5, 0.5, 0], dtype = np.float32)
+vertices = np.array([0.2, 0.1, 0, 1,
+                     0.3, 0.8, 0, 1,
+                     0.9, 0.4, 0, 1,
+                    -0.5, 0.5, 0, 1], dtype = np.float32)
 
-indices = np.array([0.0, 1, 3,
-                    1, 2, 3], dtype = np.uint32)
+indices = np.array([0, 1, 2], dtype = np.uint32)
 
 def framebuffer_size_callback(window, width, height):
     gl.glViewport(0, 0, width, height)
@@ -54,7 +54,7 @@ def main():
     glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
     glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
-    window = glfw.create_window(640, 480, "Hello World", None, None)
+    window = glfw.create_window(WIN_WIDTH, WIN_HEIGHT, "Hello Triangle", None, None)
     if window == 0:
         print("failed to create window")
         glfw.glfwTerminate()
@@ -87,7 +87,7 @@ def main():
     gl.glBindBuffer(gl.GL_ELEMENT_ARRAY_BUFFER, EBO)
     gl.glBufferData(gl.GL_ELEMENT_ARRAY_BUFFER, sys.getsizeof(indices), indices, gl.GL_STATIC_DRAW)
 
-    gl.glVertexAttribPointer(gl.glGetAttribLocation(shaderProgram, 'aPos'), 3, gl.GL_FLOAT, gl.GL_FALSE, 12, None)
+    gl.glVertexAttribPointer(gl.glGetAttribLocation(shaderProgram, 'aPos'), 4, gl.GL_FLOAT, gl.GL_FALSE, 16, None)
     gl.glEnableVertexAttribArray(0)
     gl.glBindBuffer(gl.GL_ARRAY_BUFFER, 0)
     gl.glBindVertexArray(0)
