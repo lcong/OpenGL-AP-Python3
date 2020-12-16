@@ -57,7 +57,7 @@ def main():
     window = glfw.create_window(WIN_WIDTH, WIN_HEIGHT, "Hello Triangle", None, None)
     if window == 0:
         print("failed to create window")
-        glfw.glfwTerminate()
+        glfw.terminate()
 
     glfw.make_context_current(window)
     glfw.set_framebuffer_size_callback(window, framebuffer_size_callback)
