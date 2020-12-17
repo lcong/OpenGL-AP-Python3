@@ -10,7 +10,7 @@ WIN_WIDTH = 800
 WIN_HEIGHT = 600
 
 vertexShaderSource = """
-#version 330 core
+#version 420 core
 layout (location = 0) in vec4 aPos;
 vec4 aTempPos=aPos;
 void main()
@@ -20,7 +20,7 @@ void main()
 """
 
 fragmentShaderSource = """
-#version 330 core
+#version 420 core
 out vec4 FragColor;
 void main()
 {
@@ -50,8 +50,8 @@ def processInput(window):
 
 def main():
     glfw.init()
-    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 3)
-    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MAJOR, 4)
+    glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 2)
     glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
     window = glfw.create_window(WIN_WIDTH, WIN_HEIGHT, "Hello Triangle", None, None)
