@@ -52,7 +52,7 @@ def main():
 	glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 3)
 	glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
 
-	window = glfw.create_window(WIN_WIDTH, WIN_HEIGHT, "HelloTexture", None, None)
+	window = glfw.create_window(WIN_WIDTH, WIN_HEIGHT, "Hello Texture", None, None)
 	if window == 0:
 		print("failed to create window")
 		glfw.terminate()
